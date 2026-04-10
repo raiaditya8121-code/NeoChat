@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NeoChat AI — Powered by Gemini</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+
+<!-- 3D Background Canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-orb"></div>
+      <span class="logo-text">NeoChat</span>
+    </div>
+    <button class="new-chat-btn" id="newChatBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Chat
+    </button>
+  </div>
+
+  <div class="sidebar-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="historySearch" placeholder="Search chats..." />
+  </div>
+
+  <div class="history-section">
+    <div class="history-label">Recent Chats</div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty">Start a conversation</div>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="footer-btn" id="clearAllBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Clear All
+    </button>
+    <div class="model-badge">Gemini 1.5 Flash</div>
+  </div>
+</aside>
+
+<!-- Sidebar Toggle -->
+<button class="sidebar-toggle" id="sidebarToggle">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+
+<!-- Main Content -->
+<main class="main" id="main">
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="conv-title" id="convTitle">New Conversation</div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="settingsBtn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="icon-btn" id="exportBtn" title="Export Chat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Chat Area -->
+  <div class="chat-area" id="chatArea">
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <div class="welcome-orb"></div>
+      <h1 class="welcome-title">NeoChat <span>AI</span></h1>
+      <p class="welcome-sub">Powered by Google Gemini — Ask anything</p>
+      <div class="suggestion-grid">
+        <button class="suggestion-card" data-prompt="Explain quantum computing in simple terms">
+          <div class="suggestion-icon">⚛️</div>
+          <span>Quantum Computing kya hai?</span>
+        </button>
+        <button class="suggestion-card" data-prompt="Write a Python function to sort a list">
+          <div class="suggestion-icon">🐍</div>
+          <span>Python code likhna seekho</span>
+        </button>
+        <button class="suggestion-card" data-prompt="Give me 5 healthy meal ideas for a busy person">
+          <div class="suggestion-icon">🥗</div>
+          <span>Healthy meal ideas do</span>
+        </button>
+        <button class="suggestion-card" data-prompt="How to start learning machine learning in 2025?">
+          <div class="suggestion-icon">🤖</div>
+          <span>ML kaise seekhe 2025 mein?</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-container" id="messagesContainer"></div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-wrapper">
+    <div class="input-container">
+      <div class="input-tools">
+        <button class="tool-btn active" id="normalModeBtn" title="Normal Mode">💬</button>
+        <button class="tool-btn" id="codeModeBtn" title="Code Mode">👨‍💻</button>
+        <button class="tool-btn" id="creativeModeBtn" title="Creative Mode">🎨</button>
+        <button class="tool-btn" id="analyticsModeBtn" title="Analytics Mode">📊</button>
+      </div>
+      <textarea id="messageInput" placeholder="Message NeoChat AI..." rows="1"></textarea>
+      <button class="send-btn" id="sendBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-footer">
+      <span class="mode-indicator" id="modeIndicator">Normal Mode</span>
+      <span class="char-count" id="charCount">0 / 4000</span>
+    </div>
+  </div>
+</main>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Settings</h2>
+      <button class="modal-close" id="closeSettings">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-group">
+        <label>Gemini API Key</label>
+        <div class="api-key-input">
+          <input type="password" id="apiKeyInput" placeholder="AIza..." />
+          <button class="save-key-btn" id="saveKeyBtn">Save</button>
+        </div>
+        <small>Get free API key at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a></small>
+      </div>
+      <div class="setting-group">
+        <label>Custom System Prompt</label>
+        <textarea id="systemPromptInput" placeholder="You are a helpful assistant..."></textarea>
+      </div>
+      <div class="setting-group">
+        <label>Theme</label>
+        <div class="theme-buttons">
+          <button class="theme-btn active" data-theme="dark">🌙 Dark</button>
+          <button class="theme-btn" data-theme="light">☀️ Light</button>
+          <button class="theme-btn" data-theme="aurora">🌌 Aurora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script src="/static/js/canvas.js" defer></script>
+<script src="/static/js/app.js" defer></script>
+</body>
+</html>
